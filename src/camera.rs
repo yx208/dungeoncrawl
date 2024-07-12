@@ -9,6 +9,7 @@ pub struct Camera {
 
 impl Camera {
     pub fn new(player_position: Point) -> Self {
+        // 根据玩家的位置，围绕着玩家生成地图
         Self {
             left_x: player_position.x - DISPLAY_WIDTH / 2,
             right_x: player_position.x + DISPLAY_WIDTH / 2,
