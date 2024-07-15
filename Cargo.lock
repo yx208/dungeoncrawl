@@ -599,6 +599,7 @@ name = "dungeoncrawl"
 version = "0.1.0"
 dependencies = [
  "bracket-lib",
+ "instant",
  "legion",
 ]
 
