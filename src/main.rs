@@ -4,7 +4,7 @@ mod camera;
 mod components;
 mod spawner;
 mod systems;
-mod frame;
+mod turn_state;
 
 mod prelude {
     pub use bracket_lib::prelude::*;
@@ -23,7 +23,7 @@ mod prelude {
     pub use crate::components::*;
     pub use crate::spawner::*;
     pub use crate::systems::*;
-    pub use crate::frame::*;
+    pub use crate::turn_state::*;
 }
 
 use prelude::*;
@@ -32,7 +32,6 @@ struct State {
     ecs: World,
     resource: Resources,
     systems: Schedule,
-    frame_time: f32
 }
 
 impl State {
@@ -51,12 +50,12 @@ impl State {
 
         resource.insert(map_builder.map);
         resource.insert(Camera::new(map_builder.player_start));
+        resource.insert(TurnState::AwaitingInput);
 
         Self {
             ecs,
             resource,
             systems: build_scheduler(),
-            frame_time: 0.0
         }
     }
 }
