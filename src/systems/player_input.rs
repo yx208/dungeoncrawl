@@ -7,7 +7,8 @@ pub fn player_input(
     ecs: &mut SubWorld,
     #[resource] map: &Map,
     #[resource] key: &Option<VirtualKeyCode>,
-    #[resource] camera: &mut Camera
+    #[resource] camera: &mut Camera,
+    #[resource] turn_state: &mut TurnState
 ) {
     if let Some(key) = key {
         // 匹配对应的按键，计算移动的偏移量
@@ -31,6 +32,7 @@ pub fn player_input(
                 if map.can_enter_tile(destination) {
                     *pos = destination;
                     camera.on_player_move(destination);
+                    *turn_state = TurnState::PlayerTurn
                 }
             });
         }

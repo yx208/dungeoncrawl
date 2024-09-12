@@ -31,7 +31,9 @@ use prelude::*;
 struct State {
     ecs: World,
     resource: Resources,
-    systems: Schedule,
+    input_systems: Schedule,
+    player_systems: Schedule,
+    monster_systems: Schedule,
 }
 
 impl State {
@@ -55,7 +57,9 @@ impl State {
         Self {
             ecs,
             resource,
-            systems: build_scheduler(),
+            input_systems: build_input_scheduler(),
+            player_systems: build_player_scheduler(),
+            monster_systems: build_monster_scheduler(),
         }
     }
 }
@@ -72,7 +76,12 @@ impl GameState for State {
 
         // 把当前 tick 的键盘事件插入到资源中，使得所有系统可以访问
         self.resource.insert(ctx.key);
-        self.systems.execute(&mut self.ecs, &mut self.resource);
+        let current_state = self.resource.get::<TurnState>().unwrap().clone();
+        match current_state {
+            TurnState::AwaitingInput => self.input_systems.execute(&mut self.ecs, &mut self.resource),
+            TurnState::PlayerTurn => self.player_systems.execute(&mut self.ecs, &mut self.resource),
+            TurnState::MonsterTurn => self.monster_systems.execute(&mut self.ecs, &mut self.resource),
+        }
         render_draw_buffer(ctx).expect("Render error");
     }
 }
@@ -80,7 +89,7 @@ impl GameState for State {
 fn main() -> BError {
     let context = BTermBuilder::new()
         .with_title("Dungeon Crawler")
-        .with_fps_cap(10.0)
+        .with_fps_cap(60.0)
         .with_dimensions(DISPLAY_WIDTH, DISPLAY_HEIGHT)
         .with_tile_dimensions(32, 32)
         .with_resource_path("resources/")

@@ -17,4 +17,3 @@ pub fn collisions(ecs: &mut SubWorld, commands: &mut CommandBuffer) {
             commands.remove(*entity);
         });
 }
-
