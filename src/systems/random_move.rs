@@ -3,10 +3,10 @@ use crate::prelude::*;
 #[system]
 #[write_component(Point)]
 #[read_component(MovingRandomly)]
-pub fn random_move(ecs: &mut SubWorld, #[resource] map: &Map) {
+pub fn random_move(ecs: &mut SubWorld, commands: &mut CommandBuffer) {
     // 所有可移动的实体位置
-    let mut movers = <(&mut Point, &MovingRandomly)>::query();
-    for (pos, _) in movers.iter_mut(ecs) {
+    let mut movers = <(Entity, &Point, &MovingRandomly)>::query();
+    movers.iter(ecs).for_each(|(entity, pos, _)| {
         let mut rng = RandomNumberGenerator::new();
         // 移动的距离
         let destination = match rng.range(0, 4) {
@@ -17,8 +17,6 @@ pub fn random_move(ecs: &mut SubWorld, #[resource] map: &Map) {
         };
         // 实体的位置 + 随机移动的距离
         let destination = destination + *pos;
-        if map.can_enter_tile(destination) {
-            *pos = destination;
-        }
-    }
+        commands.push(((), WantsToMove { entity: *entity, destination }));
+    });
 }
